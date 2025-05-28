@@ -1,10 +1,14 @@
-import { Context } from "aws-lambda";
-import { CloudFunctionRequest } from "./CloudFunctionRequest.ts";
+import type { Context } from "aws-lambda";
+import type { CloudFunctionRequest } from "./mod.ts";
 
 /**
- * Represents the response from a Genesys Cloud Function with example values.
+ * Represents the structured response returned from a Genesys Cloud Function.
+ *
+ * The function echoes back the original request along with metadata about the
+ * Lambda execution environment.
  *
  * @example
+ * ```ts
  * {
  *   requestReceived: {
  *     stringValue: "exampleString",
@@ -12,15 +16,16 @@ import { CloudFunctionRequest } from "./CloudFunctionRequest.ts";
  *     booleanValue: true
  *   },
  *   contextReceived: {
- *     userId: "user-123",
- *     sessionId: "session-456"
+ *     functionName: "exampleLambda",
+ *     awsRequestId: "abc-xyz-789"
  *   }
  * }
- *
- * @property requestReceived - The original request received by the cloud function.
- * @property contextReceived - The context information associated with the request.
+ * ```
  */
-export type CloudFunctionResponse = Readonly<{
-  requestReceived: CloudFunctionRequest;
-  contextReceived: Context;
-}>;
+export type CloudFunctionResponse = {
+  /** The request object that was passed to the handler. */
+  readonly requestReceived: CloudFunctionRequest;
+
+  /** AWS Lambda execution context for this invocation. */
+  readonly contextReceived: Context;
+};

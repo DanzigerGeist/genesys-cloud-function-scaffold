@@ -1,29 +1,71 @@
 # Genesys Cloud Function Scaffold with Deno 2.0
 
-This repository is an educational scaffold for building Genesys Cloud Functions using **Deno 2.0**. It demonstrates how
-to structure, build, and package a function for deployment.
+This repository provides a scaffold for building Genesys Cloud Functions using **Deno 2.0**. It is fully typed,
+testable, and structured to help you develop, document, and package Lambda-based functions for the Genesys Cloud
+platform.
+
+---
 
 ## 0. What are Genesys Cloud Functions?
 
-Genesys Cloud Functions are AWS Lambda functions that are provisioned and managed through the Genesys Cloud platform.
-They allow developers to extend Genesys Cloud capabilities by executing custom logic in response to events or API calls.
+Genesys Cloud Functions are custom **AWS Lambda** functions deployed and managed directly within the Genesys Cloud CX
+environment.
 
-## 1. Setting Up
+They are typically used for:
 
-To use this scaffold, you need to install **Deno 2.0**:
+- 🧠 **Custom routing logic** (e.g., geo-based, time-based decisions)
+- 🛠️ **Data enrichment** (e.g., lookups from external systems)
+- 🔐 **Security checks** (e.g., validate requests before queuing)
+- 📤 **3rd-party integrations** (e.g., CRM sync, ticket creation)
 
-1. Install Deno by following the instructions at [deno.land](https://deno.land/#installation).
-2. Verify the installation:
-   ```bash
-   deno --version
-   ```
+These functions are executed in response to specific events within Genesys — such as Architect call flows or interaction
+rules — and allow you to bring your own business logic to the platform.
 
-## 2. What is a Handler Function?
+---
 
-A handler function is the entry point for a Genesys Cloud Function. It processes incoming requests and returns a
-response. The handler function in this scaffold is defined as:
+## 1. Getting Started
 
-```typescript
+To use this scaffold, ensure you have the following installed:
+
+- [Deno 2.0+](https://deno.land/#installation)
+- GNU Make (for task automation)
+
+You can verify installation like this:
+
+```bash
+deno --version
+make --version
+```
+
+> On macOS, if Make is installed as `gmake`, you can alias it or add its path via:
+>
+> ```fish
+> set -Ux PATH /opt/homebrew/opt/make/libexec/gnubin $PATH
+> ```
+
+---
+
+## 2. Project Structure
+
+```text
+.
+├── src/                      # Source code
+│   ├── index.ts              # Main handler (entrypoint)
+│   └── types/                # Typed request/response definitions
+├── test/                     # Unit tests
+├── build/                    # Build logic (e.g., esbuild bundler)
+├── dist/                     # Build output (created by build step)
+├── Makefile                  # Task runner (build/package/etc)
+└── README.md
+```
+
+---
+
+## 3. Writing a Function
+
+Your Genesys Cloud Function should export a handler like this:
+
+```ts
 export const handler: CloudFunctionHandler = async (request, context) => {
   return {
     requestReceived: request,
@@ -32,78 +74,76 @@ export const handler: CloudFunctionHandler = async (request, context) => {
 };
 ```
 
-- **`request`**: Contains the data sent to the function.
-- **`context`**: Provides metadata about the execution environment (e.g., user ID, session ID).
+This function receives:
 
-## 3. Request and Response Types
+- `request`: your custom JSON payload defined by Genesys Cloud
+- `context`: AWS Lambda execution metadata
 
-This scaffold uses example types to define the structure of requests and responses. These types are for demonstration
-purposes and can be customized as needed.
+---
 
-### Request Type
+## 4. Build, Document, and Package
 
-The `CloudFunctionRequest` type represents the incoming request:
+You can use the included Makefile to simplify building and packaging, but feel free to use the commands directly.
 
-```typescript
-export type CloudFunctionRequest = Readonly<{
-  stringValue: string; // Example: "exampleString"
-  numericValue: number; // Example: 123
-  booleanValue: boolean; // Example: true
-}>;
-```
-
-### Response Type
-
-The `CloudFunctionResponse` type represents the outgoing response:
-
-```typescript
-export type CloudFunctionResponse = Readonly<{
-  requestReceived: CloudFunctionRequest;
-  contextReceived: Context;
-}>;
-```
-
-## 4. Building and Packaging
-
-This scaffold uses Deno tasks to simplify building and packaging. The tasks are defined in `deno.json` and can be
-executed using the `deno task` command.
-
-### Build the Application
-
-Run the following command to build the application:
+### Build the Function
 
 ```bash
-deno task build
+make build
 ```
 
-This will bundle the application into `dist/index.js`.
+This will:
 
-### Package the Application
+- Clean any previous build
+- Run linting, formatting, and tests
+- Bundle the function into `dist/index.js` using esbuild
 
-Run the following command to package the application:
+### Generate Docs
 
 ```bash
-deno task package
+make docs
 ```
 
-This will create a distributable ZIP file at `dist/lambda.zip`.
+This creates a full HTML documentation site in:
 
-## 5. Other Available Tasks
+```
+dist/docs/
+├── index.html
+├── script.js
+└── style.css
+```
 
-The following tasks are defined in `deno.json`:
+### Package for Deployment
 
-| Task         | Description                                   |
-| ------------ | --------------------------------------------- |
-| `build`      | Build the target files.                       |
-| `package`    | Build the distributable ZIP.                  |
-| `clean`      | Clean the build folder.                       |
-| `check:all`  | Run all code tests and checks.                |
-| `check:docs` | Check the documentation.                      |
-| `check:fmt`  | Check the code formatting.                    |
-| `check:lint` | Run the linter.                               |
-| `check:test` | Run unit tests.                               |
-| `update`     | Update dependencies to their latest versions. |
+```bash
+make package
+```
 
-## License
+This zips the built function and generated docs into:
+
+```
+dist/lambda.zip
+```
+
+You can then upload this ZIP in the Genesys Cloud admin UI when deploying the function.
+
+---
+
+## 5. Useful Commands
+
+| Command        | Description                             |
+| -------------- | --------------------------------------- |
+| `make`         | Build, document, and package everything |
+| `make build`   | Format, lint, test, and bundle          |
+| `make docs`    | Generate HTML docs into `dist/docs/`    |
+| `make package` | Bundle `index.js` + `docs` into a ZIP   |
+| `make test`    | Run all unit tests                      |
+| `make lint`    | Run linter                              |
+| `make fmt`     | Check code formatting                   |
+| `make clean`   | Delete the `dist/` directory            |
+| `make update`  | Update dependencies via `deno outdated` |
+
+---
+
+## 6. License
 
 This project is licensed under the MIT License. See the `LICENSE` file for details.

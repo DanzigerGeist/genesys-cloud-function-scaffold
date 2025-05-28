@@ -1,42 +1,34 @@
 import { assertEquals } from "@std/assert";
 import { handler } from "../src/index.ts";
-import { CloudFunctionRequest } from "../src/types/CloudFunctionRequest.ts";
-import { Context } from "aws-lambda";
+import type { CloudFunctionRequest } from "../src/types/CloudFunctionRequest.ts";
+import type { Context } from "aws-lambda";
 
-Deno.test("handler should return the request and context as part of the response", async () => {
-  const mockRequest: CloudFunctionRequest = {
+Deno.test("handler returns the original request and context", async () => {
+  const request: CloudFunctionRequest = {
     stringValue: "exampleString",
     numericValue: 123,
     booleanValue: true,
   };
 
-  const mockContext: Context = {
+  const context: Context = {
     callbackWaitsForEmptyEventLoop: false,
-    functionName: "",
-    functionVersion: "",
-    invokedFunctionArn: "",
-    memoryLimitInMB: "",
-    awsRequestId: "",
-    logGroupName: "",
-    logStreamName: "",
-    getRemainingTimeInMillis: function (): number {
-      throw new Error("Function not implemented.");
-    },
-    done: function (): void {
-      throw new Error("Function not implemented.");
-    },
-    fail: function (): void {
-      throw new Error("Function not implemented.");
-    },
-    succeed: function (): void {
-      throw new Error("Function not implemented.");
-    },
+    functionName: "testFunction",
+    functionVersion: "1",
+    invokedFunctionArn: "arn:aws:lambda:us-east-1:123456789012:function:testFunction",
+    memoryLimitInMB: "128",
+    awsRequestId: "abc-123",
+    logGroupName: "/aws/lambda/testFunction",
+    logStreamName: "2023/01/01/[$LATEST]abcdef123456",
+    getRemainingTimeInMillis: () => 3000,
+    done: () => {},
+    fail: () => {},
+    succeed: () => {},
   };
 
-  const response = await handler(mockRequest, mockContext, () => {});
+  const result = await handler(request, context, () => {});
 
-  assertEquals(response, {
-    requestReceived: mockRequest,
-    contextReceived: mockContext,
+  assertEquals(result, {
+    requestReceived: request,
+    contextReceived: context,
   });
 });
