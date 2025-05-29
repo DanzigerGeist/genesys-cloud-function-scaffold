@@ -138,7 +138,7 @@ You can then upload this ZIP in the Genesys Cloud admin UI when deploying the fu
 | `make package` | Bundle `index.js` + `docs` into a ZIP   |
 | `make test`    | Run all unit tests                      |
 | `make lint`    | Run linter                              |
-| `make fmt`     | Check code formatting                   |
+| `make format`  | Check code formatting                   |
 | `make clean`   | Delete the `dist/` directory            |
 | `make update`  | Update dependencies via `deno outdated` |
 
