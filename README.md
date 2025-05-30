@@ -50,7 +50,7 @@ make --version
 ```text
 .
 ├── src/                      # Source code
-│   ├── index.ts              # Main handler (entrypoint)
+│   ├── mod.ts                # Main handler (entrypoint)
 │   └── types/                # Typed request/response definitions
 ├── test/                     # Unit tests
 ├── build/                    # Build logic (e.g., esbuild bundler)

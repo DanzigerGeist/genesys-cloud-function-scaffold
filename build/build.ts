@@ -1,7 +1,7 @@
 /**
  * Build script for bundling the application using esbuild.
  *
- * This script bundles the application entry point (`src/index.ts`) into a single
+ * This script bundles the application entry point (`src/mod.ts`) into a single
  * JavaScript file (`dist/index.js`) optimized for Node.js 22. It includes features
  * like minification, tree-shaking, and external dependency exclusion.
  *
@@ -16,11 +16,9 @@ import { denoPlugins } from "@luca/esbuild-deno-loader";
 
 if (import.meta.main) {
   const outputFile = "dist/index.js";
-
-  console.log("📦 Bundling with esbuild...");
   await esbuild.build({
     plugins: denoPlugins({ loader: "native" }),
-    entryPoints: ["src/index.ts"],
+    entryPoints: ["src/mod.ts"],
     outfile: outputFile,
     bundle: true,
     platform: "node",
@@ -30,7 +28,5 @@ if (import.meta.main) {
     treeShaking: true,
     external: ["debug"],
   });
-
   await esbuild.stop();
-  console.log(`✅ Build complete: ${outputFile} is ready.`);
 }
